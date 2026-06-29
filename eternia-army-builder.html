@@ -1,0 +1,949 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Eternia Army Builder</title>
+<meta name="theme-color" content="#161109">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Eternia">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23161109'/%3E%3Cpath d='M50 12 L58 55 L50 92 L42 55 Z' fill='%23f0c75e'/%3E%3Ccircle cx='50' cy='14' r='8' fill='%23f0c75e'/%3E%3Crect x='30' y='52' width='40' height='8' fill='%23c9a13b'/%3E%3C/svg%3E">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23161109'/%3E%3Cpath d='M50 12 L58 55 L50 92 L42 55 Z' fill='%23f0c75e'/%3E%3Ccircle cx='50' cy='14' r='8' fill='%23f0c75e'/%3E%3Crect x='30' y='52' width='40' height='8' fill='%23c9a13b'/%3E%3C/svg%3E">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;900&family=Inter:wght@400;500;600;700&display=swap');
+
+:root{
+  --void:#161109;
+  --stone:#211a12;
+  --stone-light:#2b2218;
+  --line:#3a2f20;
+  --parchment:#e8dcc0;
+  --parchment-dim:#a99d82;
+  --gold:#c9a13b;
+  --gold-bright:#f0c75e;
+  --danger:#a8392f;
+
+  --f-motu:#c9a13b;
+  --f-evil:#7a4ea8;
+  --f-horde:#a8392f;
+  --f-rebel:#c2487a;
+  --f-snake:#5a8f3c;
+  --f-pret:#b5651d;
+  --f-ffm:#3d6b8a;
+
+  --c-melee:#a8542e;
+  --c-ranged:#3d6b8a;
+  --c-heavy:#7a2020;
+  --c-magic:#6b3fa0;
+  --c-items:#2f6f6a;
+}
+*{box-sizing:border-box;}
+html,body{overflow-x:hidden;max-width:100vw;}
+body{
+  margin:0;
+  background:var(--void);
+  background-image:
+    radial-gradient(circle at 15% 0%, rgba(201,161,59,0.06), transparent 40%),
+    radial-gradient(circle at 85% 100%, rgba(122,78,168,0.05), transparent 40%);
+  color:var(--parchment);
+  font-family:'Inter',system-ui,sans-serif;
+  -webkit-font-smoothing:antialiased;
+}
+h1,h2,h3,.display{font-family:'Cinzel',serif;}
+
+a{color:inherit;}
+
+/* ===== HEADER ===== */
+header{
+  padding:18px 16px 14px;
+  border-bottom:1px solid var(--line);
+  background:linear-gradient(180deg, rgba(43,34,24,0.6), transparent);
+}
+.title-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:space-between;}
+.title-row h1{
+  font-size:20px;letter-spacing:0.06em;margin:0;color:var(--gold-bright);
+  text-shadow:0 0 18px rgba(240,199,94,0.25);
+}
+.title-row .sub{font-size:11px;color:var(--parchment-dim);letter-spacing:0.08em;text-transform:uppercase;}
+
+.controls-row{
+  display:flex;gap:10px;flex-wrap:wrap;margin-top:14px;align-items:flex-end;
+}
+.control{display:flex;flex-direction:column;gap:4px;}
+.control label{font-size:10px;text-transform:uppercase;letter-spacing:0.08em;color:var(--parchment-dim);}
+.control input[type=number]{
+  background:var(--stone);border:1px solid var(--line);color:var(--parchment);
+  font-family:'Cinzel',serif;font-weight:700;font-size:16px;
+  width:90px;padding:6px 8px;border-radius:4px;
+}
+.control input[type=number]:focus{outline:1px solid var(--gold);}
+
+.crest{
+  margin-left:auto;
+  display:flex;align-items:center;gap:12px;
+  background:var(--stone);border:1px solid var(--line);border-radius:8px;
+  padding:8px 16px;
+}
+.crest .num{font-family:'Cinzel',serif;font-weight:900;font-size:26px;color:var(--gold-bright);transition:color .2s;}
+.crest .num.over{color:var(--danger);}
+.crest .lbl{font-size:10px;color:var(--parchment-dim);text-transform:uppercase;letter-spacing:0.08em;line-height:1.4;}
+.crest .bar{width:90px;height:6px;background:var(--stone-light);border-radius:3px;overflow:hidden;margin-top:3px;}
+.crest .bar-fill{height:100%;background:var(--gold);transition:width .25s, background .25s;}
+.crest .bar-fill.over{background:var(--danger);}
+
+.save-row{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap;align-items:center;}
+.btn{
+  font-family:'Inter',sans-serif;font-size:12px;font-weight:600;
+  background:var(--stone);border:1px solid var(--line);color:var(--parchment);
+  padding:7px 12px;border-radius:5px;cursor:pointer;transition:all .12s;
+}
+.btn:hover{border-color:var(--gold);color:var(--gold-bright);}
+.btn.primary{background:var(--gold);border-color:var(--gold);color:#1a1408;}
+.btn.primary:hover{background:var(--gold-bright);}
+.btn.danger:hover{border-color:var(--danger);color:#ff8a7e;}
+select.btn{appearance:none;cursor:pointer;}
+
+/* ===== LAYOUT ===== */
+.layout{display:flex;gap:0;align-items:flex-start;}
+.panel{flex:1;min-width:0;}
+.divider{width:1px;background:var(--line);align-self:stretch;}
+
+/* ===== BROWSER ===== */
+.tabs{display:flex;gap:2px;overflow-x:auto;padding:10px 16px 0;border-bottom:1px solid var(--line);}
+.tab{
+  font-size:12px;font-weight:600;padding:8px 12px;cursor:pointer;white-space:nowrap;
+  color:var(--parchment-dim);border-bottom:2px solid transparent;transition:all .12s;
+}
+.tab.active{color:var(--gold-bright);border-bottom-color:var(--gold);}
+.tab:hover{color:var(--parchment);}
+
+.cat-tabs{display:flex;gap:6px;padding:10px 16px;flex-wrap:wrap;}
+.cat-tab{
+  font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.04em;
+  padding:6px 10px;border-radius:5px;cursor:pointer;border:1px solid var(--line);
+  color:var(--parchment-dim);
+}
+.cat-tab.active{color:#fff;}
+
+.card-list{padding:4px 16px 24px;display:flex;flex-direction:column;gap:6px;}
+.card{
+  display:flex;align-items:center;gap:10px;
+  background:var(--stone);border:1px solid var(--line);border-radius:6px;
+  padding:9px 12px;border-left:3px solid var(--gold);
+}
+.card.dim{opacity:0.35;}
+.card .name{flex:1;min-width:0;font-size:13px;font-weight:600;overflow-wrap:break-word;}
+.card{cursor:pointer;}
+.card .cost{font-family:'Cinzel',serif;font-weight:700;color:var(--gold-bright);min-width:26px;text-align:right;font-size:14px;flex-shrink:0;}
+.card button{
+  font-size:11px;font-weight:700;background:transparent;border:1px solid var(--gold);
+  color:var(--gold-bright);padding:5px 10px;border-radius:4px;cursor:pointer;white-space:nowrap;flex-shrink:0;
+  pointer-events:none;
+}
+.card button:hover{background:var(--gold);color:#1a1408;}
+.card button:disabled{opacity:0.3;cursor:default;border-color:var(--line);color:var(--parchment-dim);}
+.card.equip-card button{border-color:var(--c-items);color:var(--c-items);}
+.card.equipped{border-left-color:#fff;background:var(--stone-light);}
+.card.equipped button{background:var(--danger);border-color:var(--danger);color:#fff;}
+
+.empty-msg{padding:30px 16px;text-align:center;color:var(--parchment-dim);font-size:13px;}
+
+.eq-row{border-radius:6px;border:1px solid var(--line);margin-bottom:0;overflow:visible;}
+.eq-head{display:flex;align-items:center;gap:8px;padding:9px 12px;cursor:pointer;border-left:3px solid var(--gold);border-radius:6px;}
+.eq-row.equipped .eq-head{background:var(--stone-light);border-left-color:#fff;}
+.eq-name{flex:1;min-width:0;font-size:13px;font-weight:600;overflow-wrap:break-word;}
+.eq-cost{font-family:'Cinzel',serif;font-weight:700;color:var(--gold-bright);flex-shrink:0;font-size:14px;}
+.eq-check{flex-shrink:0;color:#fff;font-weight:700;font-size:13px;}
+.eq-chevron{flex-shrink:0;color:var(--parchment-dim);font-size:10px;transition:transform .15s;}
+.eq-chevron.open{transform:rotate(90deg);}
+.eq-detail{display:none;padding:0 12px 12px;font-size:12px;line-height:1.5;color:var(--parchment-dim);}
+.eq-detail.open{display:block;}
+.eq-detail .eq-note{margin:6px 0 10px;}
+.eq-detail .eq-warn{color:var(--parchment-dim);font-style:italic;font-size:11px;}
+.eq-detail button{
+  font-size:11px;font-weight:700;background:transparent;border:1px solid var(--gold);
+  color:var(--gold-bright);padding:6px 12px;border-radius:4px;cursor:pointer;
+}
+.eq-row.equipped .eq-detail button{background:var(--danger);border-color:var(--danger);color:#fff;}
+
+.char-card{padding:12px 12px 4px;border-bottom:1px solid var(--line);}
+.stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px;}
+.stat{background:var(--stone);border:1px solid var(--line);border-radius:6px;padding:6px 4px;text-align:center;}
+.stat-v{display:block;font-family:'Cinzel',serif;font-weight:900;font-size:16px;color:var(--gold-bright);}
+.stat-l{display:block;font-size:9px;color:var(--parchment-dim);text-transform:uppercase;letter-spacing:0.03em;margin-top:2px;}
+.ability-box{background:var(--stone);border:1px solid var(--line);border-left:3px solid var(--gold);border-radius:6px;padding:8px 10px;margin-bottom:8px;}
+.ability-head{display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin-bottom:4px;}
+.ability-name{font-weight:700;font-size:13px;color:var(--gold-bright);}
+.ability-cost{font-size:10px;color:var(--parchment-dim);flex-shrink:0;white-space:nowrap;}
+.ability-text{font-size:12px;line-height:1.5;color:var(--parchment);}
+
+/* ===== ROSTER ===== */
+.roster-head{padding:14px 16px 6px;display:flex;justify-content:space-between;align-items:baseline;}
+.roster-head h2{font-size:14px;letter-spacing:0.06em;color:var(--gold-bright);margin:0;}
+.roster-head .count{font-size:11px;color:var(--parchment-dim);}
+.roster{padding:6px 16px 30px;display:flex;flex-direction:column;gap:10px;max-height:none;}
+
+.unit{
+  background:var(--stone);border:1px solid var(--line);border-radius:8px;
+  border-top:3px solid var(--gold);
+}
+.unit-head{display:flex;align-items:center;gap:8px;padding:10px 12px;cursor:pointer;}
+.unit-head .name{flex:1;min-width:0;font-weight:700;font-size:14px;overflow-wrap:break-word;}
+.unit-head .faction{font-size:10px;color:var(--parchment-dim);display:block;font-weight:400;margin-top:1px;}
+.unit-head .subtotal{font-family:'Cinzel',serif;font-weight:700;color:var(--gold-bright);font-size:15px;flex-shrink:0;}
+.unit-head .subtotal.addcost{color:var(--parchment-dim);font-weight:600;font-size:13px;}
+.unit-head .add-ind{color:var(--gold);font-family:'Cinzel',serif;font-weight:900;font-size:18px;flex-shrink:0;line-height:1;}
+.unit-head .chevron{color:var(--parchment-dim);font-size:11px;transition:transform .15s;flex-shrink:0;}
+.unit-head .chevron.open{transform:rotate(90deg);}
+.unit-head .rm{
+  background:transparent;border:none;color:var(--parchment-dim);font-size:16px;cursor:pointer;
+  padding:2px 6px;line-height:1;flex-shrink:0;
+}
+.unit-head .rm:hover{color:var(--danger);}
+
+.gear-chips{display:flex;flex-wrap:wrap;gap:5px;padding:0 12px 10px;}
+.gear-chip{
+  font-size:10px;padding:3px 8px;border-radius:10px;background:var(--stone-light);
+  border:1px solid var(--line);display:flex;align-items:center;gap:5px;
+}
+.gear-chip .x{cursor:pointer;color:var(--parchment-dim);font-weight:700;}
+.gear-chip .x:hover{color:var(--danger);}
+
+.equip-panel{border-top:1px solid var(--line);background:var(--void);padding:10px 12px 14px;display:none;}
+.equip-panel.open{display:block;}
+.equip-cats{display:flex;gap:4px;margin-bottom:8px;flex-wrap:wrap;}
+.equip-cat-btn{
+  font-size:10px;font-weight:700;text-transform:uppercase;padding:5px 9px;border-radius:4px;
+  border:1px solid var(--line);color:var(--parchment-dim);cursor:pointer;
+}
+.equip-cat-btn.active{color:#fff;border-color:currentColor;}
+.equip-items{display:flex;flex-direction:column;gap:4px;}
+
+.foot{padding:20px 16px 36px;font-size:11px;color:var(--parchment-dim);line-height:1.6;border-top:1px solid var(--line);margin-top:10px;}
+
+.rules-panel{display:none;padding:16px;background:var(--stone-light);border-bottom:1px solid var(--line);}
+.rules-panel.open{display:block;}
+.rules-panel h3{font-size:14px;color:var(--gold-bright);margin:0 0 12px;letter-spacing:0.04em;}
+.rules-panel .rsrc{font-family:'Inter',sans-serif;font-size:10px;font-weight:400;color:var(--parchment-dim);text-transform:none;letter-spacing:0;}
+.rule-block{margin-bottom:12px;}
+.rule-block strong{font-size:12px;color:var(--gold);text-transform:uppercase;letter-spacing:0.04em;}
+.rule-block p, .rule-block ul{font-size:12.5px;line-height:1.55;color:var(--parchment);margin:6px 0 0;}
+.rule-block ul{padding-left:18px;}
+.rule-block li{margin-bottom:3px;}
+
+@media (max-width:860px){
+  .layout{flex-direction:column;}
+  .divider{display:none;}
+  .crest{width:100%;margin-left:0;}
+}
+::-webkit-scrollbar{width:8px;height:8px;}
+::-webkit-scrollbar-thumb{background:var(--line);border-radius:4px;}
+::-webkit-scrollbar-track{background:transparent;}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="title-row">
+    <div>
+      <h1>⚔ ETERNIA ARMY BUILDER</h1>
+      <div class="sub">Masters of the Universe: Battleground — Cost Tables v9.0</div>
+    </div>
+    <div class="crest">
+      <div>
+        <div class="lbl">Punkte verwendet</div>
+        <div class="bar"><div class="bar-fill" id="barFill" style="width:0%"></div></div>
+      </div>
+      <div class="num" id="totalNum">0</div>
+      <div class="lbl" id="limitLbl">/ 50</div>
+    </div>
+  </div>
+
+  <div class="controls-row">
+    <div class="control">
+      <label for="pointLimit">Punktelimit</label>
+      <input type="number" id="pointLimit" value="50" min="0" step="1">
+    </div>
+  </div>
+
+  <div class="save-row">
+    <button class="btn" id="btnRules">ℹ Regeln &amp; Symbole</button>
+    <button class="btn primary" id="btnSave">Armee speichern</button>
+    <select class="btn" id="loadSelect" style="min-width:160px;">
+      <option value="">Gespeicherte Armee laden…</option>
+    </select>
+    <button class="btn danger" id="btnDelete">Löschen</button>
+    <button class="btn" id="btnReset">Alles zurücksetzen</button>
+  </div>
+</header>
+
+<div class="rules-panel" id="rulesPanel">
+  <h3>Regeln &amp; Symbole <span class="rsrc">— Quelle: offizielles Regelheft v2.0, Archon Studio</span></h3>
+
+  <div class="rule-block">
+    <strong>Waffentypen</strong>
+    <ul>
+      <li><b>Nahkampf:</b> nur gegen angrenzende Gegner. Test: Stärke gegen Robustheit des Ziels.</li>
+      <li><b>Fernkampf:</b> braucht Sichtlinie + Reichweite (in Zoll), nicht nutzbar im Nahkampf. Test: Wahrnehmung gegen Robustheit.</li>
+      <li><b>Magie:</b> wie Fernkampf, kostet zusätzlich Mana. Test: Macht gegen Geist des Ziels.</li>
+      <li><b>Schwer:</b> wie Fernkampf, aber auch im Nahkampf einsetzbar.</li>
+    </ul>
+  </div>
+
+  <div class="rule-block">
+    <strong>AP-Kosten pro Angriff</strong>
+    <p>Die erste Nutzung eines Waffentyps in einer Aktivierung kostet 1 AP. Jede weitere Nutzung desselben Typs in derselben Aktivierung kostet 1 AP mehr (2. Nutzung = 2 AP, 3. Nutzung = 3 AP, usw.) — unabhängig davon, welche konkrete Waffe dieses Typs verwendet wird.</p>
+  </div>
+
+  <div class="rule-block">
+    <strong>Würfel-Modifikator &amp; Sonderfähigkeit</strong>
+    <p>Jede Waffenkarte zeigt ein Würfel-Symbol (zusätzlicher Würfel, ein Würfel weniger, oder kein Modifikator) für den Angriffstest. Zusätzlich hat <u>jede einzelne Waffe</u> eine eigene, einzigartige Sonderfähigkeit sowie eine eigene Erfolgstabelle (wie viele Wunden bei wie vielen Erfolgen). Dieser Text steht ausschließlich auf der jeweiligen physischen Karte — er ist nicht generisch und taucht daher hier in der App nicht auf, solange ich keine Kartentexte von dir bekomme.</p>
+  </div>
+
+  <div class="rule-block">
+    <strong>Items</strong>
+    <p>Vier Kategorien: Trinket, Shield, Armour, Module. Ein Item hat entweder eine passive Fähigkeit (immer aktiv) oder eine aktive Fähigkeit mit AP-/Mana-Kosten. "Disposable"-Items sind Einmal-Effekte, die als Freie Aktion genutzt werden können.</p>
+  </div>
+
+  <button class="btn" id="btnRulesClose" style="margin-top:6px;">Schließen</button>
+</div>
+
+<div class="layout">
+  <div class="panel" id="browserPanel">
+    <div class="tabs" id="mainTabs"></div>
+    <div id="browserBody"></div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="panel" id="rosterPanel">
+    <div class="roster-head">
+      <h2>DEINE ARMEE</h2>
+      <span class="count" id="rosterCount">0 Einheiten</span>
+    </div>
+    <div class="roster" id="rosterList"></div>
+  </div>
+</div>
+
+<div class="foot">
+  Wenn du einen Charakter anklickst, werden ihm automatisch nur die Waffen- und Item-Optionen aus seiner eigenen Erscheinungsgruppe der Cost Tables v9.0 zugeordnet (z.B. erhält ein Starter-Charakter nur Starter-Ausrüstung). Das ist die einzige im Originaldokument hinterlegte Zuordnung zwischen Charakteren und Ausrüstung — eine darüberhinausgehende, modellspezifische Zuordnung (z.B. "He-Man darf nur Sword of Power tragen") steht in den Cost Tables nicht und wurde daher nicht erraten. Bei Abweichungen zu deinem Regelwerk gerne Bescheid geben. Einzigartige Charaktere können nur einmal der Armee hinzugefügt werden; Ausrüstung ist mehrfach verfügbar.
+</div>
+
+<script>
+/* ============ DATA ============ */
+const WAVES = ["Starter","W1","W3","W4","W5","W6","W7","W8","W9","W10","W11","Promo"];
+
+const CHARACTERS = [
+  // Masters of the Universe (HM1-HM5)
+  {n:"He-Man",f:"Masters of the Universe",w:"Starter",c:19,
+    st:{hp:5,def:3,mind:3,str:3,per:3,pow:5,mv:"5/8"},
+    ab:[
+      {n:"Ich habe die Kraft!",cost:"—",t:"Würfelt He-Man bei einer Probe neu, darf er pro ausgegebenem Glücks-Token mit 1 zusätzlichen Würfel neu würfeln."},
+      {n:"Übermenschlicher Reflex",cost:"—",t:"He-Man kann kein Glücks-Token durch Schicksals- und Ruhmkarten erhalten. Erhält er einen Erfolgsstern, erhält er auch 1 Glücks-Token."}
+    ]},
+  {n:"Man-At-Arms",f:"Masters of the Universe",w:"Starter",c:18,
+    st:{hp:5,def:4,mind:2,str:2,per:4,pow:4,mv:"5/8"},
+    ab:[
+      {n:"Immer wachsam",cost:"—",t:"Sind am Ende der Aktivierung keine Feinde im Umkreis von 8\" Zoll, erhalte 1 Glücks-Token."},
+      {n:"Genialer Taktiker",cost:"1 Initiative + 1 Glück",t:"Probe +1. Bei 1 Erfolgsstern: Der nächste in dieser Runde aktivierte Verbündete erhält 2 Glücks-Token. Nicht bei einer Unterbrechung nutzbar."}
+    ]},
+  {n:"Orko",f:"Masters of the Universe",w:"Starter",c:16,
+    st:{hp:3,def:1,mind:3,str:6,per:2,pow:2,mv:"5/8"},
+    ab:[
+      {n:"Zauberhut",cost:"—",t:"Orko startet das Spiel mit 3 Glücks-Token. Führt Orko oder ein Verbündeter im Umkreis von 8\" eine Verteidigungsprobe durch, darf Orko bis zu 3 Glücks-Token ausgeben für je 1 zusätzlichen Würfel."},
+      {n:"Reisender von Trolla",cost:"—",t:"Hat Orko Glücks- und Initiative-Token für eine Fähigkeit ausgegeben, muss er vor der Angriffsprobe eine Wahrnehmungsprobe +1 durchführen. Bei weniger als 2 Erfolgssternen: Sein Zauber ist wirkungslos."}
+    ]},
+  {n:"Ram Man",f:"Masters of the Universe",w:"Starter",c:18,
+    st:{hp:6,def:4,mind:1,str:2,per:2,pow:4,mv:"4/6"},
+    ab:[
+      {n:"Rammtempo",cost:"1 Initiative + 2 Glück",t:"Ram Man führt 1 kostenlose Aktion „Bewegen\" mit Bewegungswert +2 (höchstens 6) aus. Stärkeprobe gegen Verteidigung bei jedem Feind im Umkreis von 2 Hexfeldern."},
+      {n:"Menschlicher Rammbock",cost:"—",t:"Beendet Ram Man seine Aktivierung im Gefecht, erhält er 1 Glücks-Token."}
+    ]},
+  {n:"Stratos",f:"Masters of the Universe",w:"Starter",c:17,
+    st:{hp:4,def:2,mind:3,str:3,per:5,pow:3,mv:"6/9"},
+    ab:[
+      {n:"In den Himmel!",cost:"bis zu 5 Glück",t:"Ist Stratos nicht im Gefecht, gib bis zu 5 Glücks-Token aus, um für jedes davon 1 Hexfeld zu springen."},
+      {n:"Anführer Avions",cost:"1 Initiative + 1 Glück",t:"Probe. Bei 1 Erfolgsstern: Wähle 1 aktivierten Verbündeten (keine Sichtlinie nötig). Er erhält 1 Glücks- oder 1 Initiative-Token. Nicht bei einer Unterbrechung nutzbar."}
+    ]},
+  // Evil Warriors (HE1-HE4)
+  {n:"Skeletor",f:"Evil Warriors",w:"Starter",c:21,
+    st:{hp:5,def:3,mind:3,str:5,per:2,pow:4,mv:"5/8"},
+    ab:[
+      {n:"Beschwören",cost:"1 Initiative + 2 Glück",t:"Probe -2. Bei 1 Erfolgsstern: Teleportiere einen Verbündeten im Umkreis von 12\" auf ein Hexfeld angrenzend zu Skeletor."},
+      {n:"Herr des Bösen",cost:"—",t:"Bis zum Ende der aktuellen Aktivierung oder Unterbrechung darf Skeletor seine Spezialfähigkeit auch im Gefecht einsetzen."}
+    ]},
+  {n:"Evil-Lyn",f:"Evil Warriors",w:"Starter",c:16,
+    st:{hp:4,def:1,mind:4,str:5,per:3,pow:2,mv:"5/8"},
+    ab:[
+      {n:"Geteilte Kraft",cost:"—",t:"Jeder Verbündete im Umkreis von 8\" um Evil-Lyn darf 1 eigenes Glücks-Token wie ein Glücks-Token von Evil-Lyn ausgeben."},
+      {n:"Dunkle Präsenz",cost:"1 Glück",t:"Probe gegen einen Feind im Umkreis von 16\"."}
+    ]},
+  {n:"Mer-Man",f:"Evil Warriors",w:"Starter",c:17,
+    st:{hp:5,def:3,mind:2,str:3,per:4,pow:4,mv:"5/8"},
+    ab:[
+      {n:"In den Tümpel",cost:"2 Glück",t:"Probe. Bei 1 Erfolgsstern: Lege einen Wasserfeld-Marker im Umkreis von 8\". Das Gebiet innerhalb von 2 Hexfeldern um diesen Marker ist schwieriges Gelände."},
+      {n:"Froststrahl",cost:"1 Glück",t:"Probe +1 gegen einen Feind im Umkreis von 12\"."}
+    ]},
+  {n:"Tri-Klops",f:"Evil Warriors",w:"Starter",c:17,
+    st:{hp:5,def:4,mind:2,str:2,per:3,pow:5,mv:"4/6"},
+    ab:[
+      {n:"Gammablick",cost:"2 Glück",t:"Probe +2 gegen einen Feind im Umkreis von 12\". Bei 1 Erfolgsstern: Alle Angriffe gegen diesen Feind erhalten einen Malus, bis er von Tri-Klops Charakter abrückt."},
+      {n:"Optikstrahl",cost:"bis zu 3 Glück",t:"Erhält ein Feind im Umkreis von 8\" Schaden durch Tri-Klops, darf Tri-Klops bis zu 3 Glücks-Token ausgeben, um eine zusätzliche Wahrnehmungsprobe (+1 pro ausgegebenem Glücks-Token) gegen diesen Feind durchzuführen."}
+    ]},
+  {n:"Trap Jaw",f:"Evil Warriors",w:"Starter",c:16,
+    st:{hp:4,def:2,mind:3,str:2,per:3,pow:null,mv:"5/5"},
+    ab:[
+      {n:"Waffentausch",cost:"1 Initiative",t:"Hat Trap Jaw den Hakenaufsatz ausgerüstet, ersetze ihn durch den Laseraufsatz. Hat Trap Jaw den Laseraufsatz ausgerüstet, ersetze ihn durch den Hakenaufsatz."},
+      {n:"Greifhaken",cost:"2 Glück",t:"Hat Trap Jaw den Hakenaufsatz ausgerüstet: Wahrnehmungsprobe -1. Trap Jaw darf pro Erfolgsstern bis zu 2 Hexfelder in gerader Linie nach vorne springen."}
+    ]},
+];
+
+const MELEE = [
+  {n:"Axe",w:"Starter",c:1,desc:"Reichweite –, Würfel-Modifikator –. Sonderfähigkeit: Nutzt der Angriff ein Glücks-Token, füge +1 Würfel hinzu. Erfolgstabelle: 1★ = 1 Wunde, 3★ = 2 Wunden."},
+  {n:"Battle Axe",w:"Starter",c:5,desc:"Reichweite –, Würfel-Modifikator –. Sonderfähigkeit: Wurde der Angriff direkt nach der Aktion „Bewegen\" ausgeführt, darf das Ziel bei der Verteidigungsprobe höchstens mit 2 Würfeln würfeln. Erfolgstabelle: 1★ = 1 Wunde, 2★ = 2 Wunden, 4★ = 3 Wunden."},
+  {n:"Dagger",w:"Starter",c:3,desc:"Reichweite –, Würfel-Modifikator –. Sonderfähigkeit: Belegt keinen Ausrüstungsplatz für Nahkampfwaffen. Angriffe mit dieser Waffe kosten 1 Initiative-Token weniger (mindestens aber 1). Erfolgstabelle: 1★ = 1 Wunde (und 1 weitere bei Flankenangriff), 3★ = 2 Wunden."},
+  {n:"Electronic Sword of Power",w:"Starter",c:4,desc:"Reichweite –, Würfel-Modifikator –. Sonderfähigkeit: Das Ziel muss bei der Verteidigungsprobe entweder mit so vielen Würfeln würfeln wie sein eigenes Würfel-Symbol oder normal würfeln, wobei dann nur 6er als Erfolge zählen. Erfolgstabelle: 1★ = 1 Wunde, 3★ = 2 Wunden, 5★ = 3 Wunden."},
+  {n:"Flying Fists",w:"Starter",c:3,desc:"Reichweite –, Würfel-Modifikator +1. Sonderfähigkeit: Schaltet der Angriff das Ziel aus, darf dieser Charakter eine kostenlose Aktion „Bewegen\" ausführen. Erfolgstabelle: 1★ = 1 Wunde (und dieser Charakter erhält 1 Glücks-Token), 2★ = 2 Wunden (und dieser Charakter erhält 1 Glücks-Token)."},
+  {n:"Havoc Staff",w:"Starter",c:2,desc:"Reichweite –, Würfel-Modifikator –. Sonderfähigkeit: Jedes Mal, wenn ein Verbündeter mindestens 1 Wunde erhält, erhält Skeletor 1 Glücks-Token. Erfolgstabelle: 1★ = 1 Wunde, 3★ = 2 Wunden."},
+  {n:"Hook Attachment",w:"Starter",c:2,desc:"Reichweite –, Würfel-Modifikator +1. Sonderfähigkeit: Trap Jaw muss keinen Ausrüstungsplatz für Nahkampfwaffen belegen, um diese Waffe auszurüsten. Erfolgstabelle: 1★ = 1 Wunde, 3★ = 2 Wunden."},
+  {n:"Longsword",w:"Starter",c:2,desc:"Reichweite –, Würfel-Modifikator –. Sonderfähigkeit: Hat das Ziel den Furcht-Status, erhalte +1 Würfel. Erfolgstabelle: 1★ = 1 Wunde, 3★ = 2 Wunden, 5★ = 2 Wunden und 1 weitere Wunde (wenn das Ziel den Furcht-Status hat)."},
+  {n:"Mace",w:"Starter",c:3,desc:"Reichweite –, Würfel-Modifikator –. Sonderfähigkeit: Hat dieser Charakter ein Glücks-Token, füge +1 Würfel bei allen Verteidigungsproben hinzu. Erfolgstabelle: 1★ = 1 Wunde (und Ziel 2 Hexfelder schieben), 3★ = 2 Wunden (und Ziel 2 Hexfelder schieben)."},
+  {n:"Purple Sword of Power",w:"Starter",c:3,desc:"Reichweite –, Würfel-Modifikator –. Sonderfähigkeit: Hat dieser Charakter ein bestimmtes Symbol, füge +1 Würfel zu allen Angriffs- und Fertigkeitsproben hinzu. Erfolgstabelle: 2★ = 1 Wunde (und dieser Charakter erhält 2 Glücks-Token), 3★ = 2 Wunden (und dieser Charakter erhält 2 Glücks-Token)."},
+  {n:"Staff of Avion",w:"Starter",c:3,desc:"Reichweite –, Würfel-Modifikator –. Sonderfähigkeit: Nutzt der Angriff ein Glücks-Token, füge +3 Würfel hinzu. Du darfst höchstens mit 6 Würfeln würfeln. Erfolgstabelle: 1★ = 1 Wunde, 3★ = 2 Wunden."},
+  {n:"Sword of Power",w:"Starter",c:3,desc:"Reichweite –, Würfel-Modifikator –. Sonderfähigkeit: Gib vor dem Angriff bis zu 3 Glücks-Token aus, um für jedes davon 1 Würfel zu erhalten. Erfolgstabelle: 1★ = 1 Wunde, 3★ = 2 Wunden, 5★ = 3 Wunden."},
+  {n:"Sword of Rakash",w:"Starter",c:4,desc:"Reichweite –, Würfel-Modifikator –. Sonderfähigkeit: Du darfst bei allen Charakteren für jeden Charakter mit Erfolgsstern und Glücks-Token dieses Charakters 1× kostenlos neu würfeln (höchstens 3×). Erfolgstabelle: 1★ = 1 Wunde, 2★ = 2 Wunden, 5★ = 3 Wunden."},
+  {n:"Terror Claws",w:"Starter",c:3,desc:"Reichweite –, Würfel-Modifikator +1. Sonderfähigkeit: Angriffe mit dieser Waffe kosten bei Unterbrechungen 1 Initiative-Token weniger (mindestens aber 0). Erfolgstabelle: 1★ = 1 Wunde (und 1), 2★ = 1 Wunde (und 1), 4★ = 2 Wunden."},
+  {n:"Trident",w:"Starter",c:4,desc:"Reichweite –, Würfel-Modifikator –. Sonderfähigkeit: Ist das Ziel in schwierigem Gelände, erhältst du +1 Würfel. Erfolgstabelle: 1★ = 1 Wunde, 2★ = 2 Wunden, 4★ = 3 Wunden."},
+  {n:"Beast Man's Whip",w:"W1",c:2},{n:"Scythe of Doom",w:"W1",c:2},{n:"Skull Weapon",w:"W1",c:4},
+  {n:"Spear",w:"W1",c:3},{n:"Staff of Power",w:"W1",c:2},{n:"Teela's Sword",w:"W1",c:2},
+  {n:"Club",w:"W3",c:2},{n:"Electro Shocker Spear",w:"W3",c:3},{n:"Long Axe",w:"W3",c:4},{n:"Short Axe",w:"W3",c:2},
+  {n:"Catra's Whip",w:"W4",c:2},{n:"Dragon Staff",w:"W4",c:1},{n:"Horde Axe",w:"W4",c:3},
+  {n:"Horde Staff",w:"W4",c:3},{n:"Propeller Arm",w:"W4",c:3},
+  {n:"Cursed Sword",w:"W5",c:2},{n:"Halberd",w:"W5",c:3},{n:"Knife of Evil",w:"W5",c:3},{n:"Metal Fist",w:"W5",c:2},
+  {n:"Cursed Axe",w:"W6",c:3},{n:"Scorpia's Tail",w:"W6",c:1},
+  {n:"Angelic Sword",w:"W7",c:3},{n:"Axe Comb",w:"W7",c:3},{n:"Staff of Light",w:"W7",c:2},{n:"Sword of Protection",w:"W7",c:3},
+  {n:"Snake Dagger",w:"W8",c:2},{n:"Snake-Head Staff",w:"W8",c:2},{n:"Enormous Fangs",w:"W8",c:1},
+  {n:"Viper Staff",w:"W8",c:2},{n:"Snake Mace",w:"W8",c:3},
+  {n:"Power Clamp",w:"W9",c:2},{n:"Mini Clamp",w:"W9",c:1},{n:"Orange Sword of Power",w:"W9",c:2},{n:"Orange Axe",w:"W9",c:2},
+  {n:"King's Axe",w:"W10",c:3},{n:"He-Ro Staff - Green",w:"W10",c:2},{n:"He-Ro Staff - Red",w:"W10",c:2},
+  {n:"He-Ro Staff - Purple",w:"W10",c:2},{n:"Eldor Staff",w:"W10",c:2},{n:"Queen Staff",w:"W10",c:2},
+  {n:"Axe Attachment",w:"W11",c:3},{n:"Claw Attachment",w:"W11",c:3},{n:"Nature Mace",w:"W11",c:1},{n:"Stone Knife",w:"W11",c:2},
+  {n:"Rotating Blades",w:"Promo",c:3},{n:"Jaws",w:"Promo",c:2},
+];
+
+const RANGED = [
+  {n:"Arm Cannon",w:"Starter",c:2,desc:"Reichweite 12, Würfel-Modifikator –. Sonderfähigkeit: Belegt keinen Ausrüstungsplatz für Fernkampfwaffen. Angriffe mit dieser Waffe kosten 1 Initiative-Token weniger (mindestens aber 1) und erhalten keinen Bereichsmalus bei Unterbrechungen. Erfolgstabelle: 1★ = 1 Wunde, 4★ = 2 Wunden."},
+  {n:"Blaster",w:"Starter",c:4,desc:"Reichweite 12, Würfel-Modifikator –. Sonderfähigkeit: Einmal pro Aktivierung oder Unterbrechung: Hat dieser Charakter mit dem Blaster ausgeführt, darf er sofort einen kostenlosen Angriff mit dem Blaster ausführen. Erfolgstabelle: 2★ = 1 Wunde, 3★ = 2 Wunden."},
+  {n:"Fear Gas Cannon",w:"Starter",c:4,desc:"Reichweite 16, Würfel-Modifikator –. Sonderfähigkeit: Erhalte 1 Würfel für jeden Charakter mit Furcht-Status (höchstens 3). Erfolgstabelle: 1★ = 1 Wunde, 2★ = 1 Wunde (und Ziel erhält Furcht-Status), 3★ = 2 Wunden (und Ziel erhält Furcht-Status)."},
+  {n:"Flamethrower",w:"Starter",c:2,desc:"Reichweite 8, Würfel-Modifikator -1 (gilt zusätzlich als „Schwer\", auch im Nahkampf einsetzbar). Sonderfähigkeit: Diese Waffe betrifft das Ziel und alle Charaktere im Umkreis von 2 Hexfeldern davon. Nur 6er zählen bei den Verteidigungsproben der Ziele als Erfolg. Erfolgstabelle: 2★ = 1 Wunde, 3★ = 2 Wunden."},
+  {n:"Horde Crossbow",w:"Starter",c:3,desc:"Reichweite 12, Würfel-Modifikator +1. Sonderfähigkeit: Das Ziel darf bei der Verteidigungsprobe höchstens mit 2 Würfeln würfeln. Erfolgstabelle: 1★ = 1 Wunde, 2★ = 1 Wunde (und Ziel 2 Hexfelder schieben)."},
+  {n:"Laser Attachment",w:"Starter",c:0,desc:"Reichweite 12, Würfel-Modifikator -1. Sonderfähigkeit: Belegt keinen Ausrüstungsplatz für Fernkampfwaffen. Trap Jaw darf vor dem Angriff 1 der folgenden Boni ausgeben: +2 Würfel oder +2 Initiative-Token für beide Boni; Reichweite um 4″ erhöhen. Erfolgstabelle: 1★ = 1 Wunde, 3★ = 2 Wunden, 5★ = 3 Wunden."},
+  {n:"Laser Pistol",w:"Starter",c:3,desc:"Reichweite 12, Würfel-Modifikator –. Sonderfähigkeit: Belegt keinen Ausrüstungsplatz für Fernkampfwaffen. Angriffe mit dieser Waffe kosten 1 Initiative-Token weniger (mindestens aber 1). Erfolgstabelle: 1★ = 1 Wunde, 2★ = 1 Wunde (und 1)."},
+  {n:"Laser Rifle",w:"Starter",c:3,desc:"Reichweite 16, Würfel-Modifikator –. Sonderfähigkeit: Nutzt der Angriff ein Glücks-Token, füge +3 Würfel hinzu. Du darfst nicht mit mehr als 6 Würfeln würfeln. Erfolgstabelle: 1★ = 1 Wunde, 4★ = 2 Wunden."},
+  {n:"Photon Neutralizer",w:"Starter",c:4,desc:"Reichweite 16, Würfel-Modifikator +1. Sonderfähigkeit: Erreicht ein Unterbrechungsangriff mit dieser Waffe mindestens 2 Erfolgssterne, erhalte 1 Initiative-Token. Erfolgstabelle: 1★ = 1 Wunde, 2★ = 1 Wunde, 4★ = 2 Wunden."},
+  {n:"Bionatops Blaster",w:"W1",c:2},{n:"Mega Blaster",w:"W1",c:3},
+  {n:"Dragon Blaster",w:"W3",c:4},{n:"Laser Gun (Human)",w:"W3",c:3},{n:"Laser Gun (Monster)",w:"W3",c:0},{n:"Laser Gun (Robot)",w:"W3",c:0},
+  {n:"Rebel Pistol",w:"W4",c:2},{n:"Stink Gun",w:"W4",c:3},{n:"Cosmic Blaster",w:"W4",c:1},
+  {n:"Energy Cannon",w:"W5",c:2},{n:"Two-Sided Gun",w:"W5",c:2},{n:"Black Blaster",w:"W5",c:3},
+  {n:"Magic Wand",w:"W6",c:2},{n:"Multi-Cannon",w:"W6",c:3},{n:"Power Blaster",w:"W6",c:3},
+  {n:"Dragonfly Crossbow",w:"W7",c:2},{n:"Net",w:"W7",c:1},
+  {n:"Bubble Projector",w:"W8",c:4},{n:"Combow",w:"W8",c:2},
+  {n:"Kobra Pistol",w:"W9",c:2},{n:"Snake Blaster",w:"W9",c:3},
+  {n:"Long Rifle",w:"W10",c:4},{n:"Teleportation Ray",w:"W10",c:2},
+  {n:"Zodac's Blaster",w:"W11",c:2},{n:"Dare's Blaster",w:"W11",c:2},
+  {n:"Blaster Attachment",w:"Promo",c:3},{n:"Slingshot",w:"Promo",c:1},{n:"Dual Laser Cannons",w:"Promo",c:1},
+];
+
+const HEAVY = [
+  {n:"Demolisher Missile",w:"W6",c:4},{n:"Heavy Laser",w:"W6",c:4},
+  {n:"Preternian Laser",w:"W10",c:3},
+  {n:"Legendary Blasters",w:"Promo",c:2},{n:"Shark Lasers",w:"Promo",c:4},
+];
+
+const MAGIC = [
+  {n:"Cosmic Storm",w:"Starter",c:1,desc:"Reichweite 12, Würfel-Modifikator –, Mana-Kosten 0. Sonderfähigkeit: Du musst nicht den teuersten Effekt ausführen. Wähle 1 beliebigen Effekt entsprechend der Anzahl gewürfelter Erfolgssterne. Effekttabelle: 1★ = Orko erhält 2 Glücks-Token, 2★ = 1 Wunde, 3★ = Ziel 3 Hexfelder teleportieren."},
+  {n:"Cursed Minions",w:"Starter",c:2,desc:"Reichweite 8, Würfel-Modifikator –, Mana-Kosten 1. Sonderfähigkeit: Belegt keinen Ausrüstungsplatz für Zauber. Du kannst diesen Zauber auch im Gefecht nutzen. Angriffe mit diesem Zauber kosten 1 Initiative-Token weniger (mindestens aber 1). Erfolgstabelle: 1★ = Ziel 2 Hexfelder schieben, 2★ = Ziel 2 Hexfelder schieben (und 1 Wunde)."},
+  {n:"Eternal Binds",w:"Starter",c:1,desc:"Reichweite 12, Würfel-Modifikator +1, Mana-Kosten 1. Sonderfähigkeit: Hat das Ziel ein bestimmtes Symbol, erhalte +1. Erfolgstabelle: 1★ = Ziel verliert 2 Initiative-Token, 2★ = Ziel verliert 2 Initiative-Token (und du erhältst 1 Glücks-Token)."},
+  {n:"Fireball",w:"Starter",c:3,desc:"Reichweite 12, Würfel-Modifikator –, Mana-Kosten 2. Sonderfähigkeit: Dieser Zauber betrifft das Ziel und alle Charaktere im Umkreis von 1 Hexfeld. Gib vor dem Angriff bis zu 2 zusätzliche Glücks-Token aus, um den Radius um je 1 Hexfeld zu vergrößern. Erfolgstabelle: 2★ = 1 Wunde, 3★ = 2 Wunden, 6★ = 3 Wunden."},
+  {n:"Flaming Missile",w:"Starter",c:3,desc:"Reichweite 16, Würfel-Modifikator –, Mana-Kosten 1. Sonderfähigkeit: Hat dieser Charakter ein Glücks-Token, sind die Initiative-Kosten auf 0 reduziert. Erfolgstabelle: 1★ = 1 Wunde, 3★ = 2 Wunden."},
+  {n:"Magic Blast",w:"Starter",c:3,desc:"Reichweite 12, Würfel-Modifikator -1, Mana-Kosten 1. Sonderfähigkeit: Hat das Ziel weniger Glücks-Token als der Angreifer (nachdem für den Zauber gezahlt wurde), erhalte +2 Würfel. Erfolgstabelle: 2★ = 1 Wunde, 3★ = 2 Wunden, 5★ = 3 Wunden."},
+  {n:"Shadow Strike",w:"Starter",c:2,desc:"Reichweite 12, Würfel-Modifikator -1, Mana-Kosten 3. Sonderfähigkeit: Gib vor dem Angriff bis zu 3 Glücks-Token aus, um je 1 zusätzlichen Würfel dafür zu erhalten. Erfolgstabelle: 1★ = 1 Wunde, 3★ = 2 Wunden, 5★ = 3 Wunden."},
+  {n:"Spell of Protection",w:"Starter",c:1,desc:"Reichweite 8, Würfel-Modifikator –, Mana-Kosten 2. Sonderfähigkeit: Dieser Zauber hat Verbündete statt Feinde als Ziel. Das Ziel führt keine Verteidigungsprobe durch; Angriffe mit diesem Zauber kosten 1 Initiative-Token weniger (mindestens aber 1)."},
+  {n:"Thunder",w:"Starter",c:3,desc:"Reichweite 12, Würfel-Modifikator –, Mana-Kosten 1. Sonderfähigkeit: Bei Unterbrechungen kosten Angriffe mit diesem Zauber 1 Initiative-Token weniger (mindestens aber 1). Erfolgstabelle: 1★ = 1 Wunde, 2★ = 1 Wunde (und 1), 3★ = 2 Wunden."},
+  {n:"Fatal Flaw",w:"W1",c:2},{n:"Ray of Destruction",w:"W1",c:2},{n:"Magic Arrow",w:"W1",c:3},{n:"Illusionary Attack",w:"W1",c:2},
+  {n:"Power of Friendship",w:"W3",c:3},{n:"Strong Will Fall",w:"W3",c:3},{n:"Swiftness",w:"W3",c:2},{n:"Tornado",w:"W3",c:3},
+  {n:"Calamity",w:"W4",c:3},{n:"Mana Burn",w:"W4",c:3},{n:"Overwhelming Power",w:"W4",c:1},
+  {n:"Chain Lightning",w:"W5",c:4},{n:"Hand of Fate",w:"W5",c:2},{n:"Insults",w:"W5",c:1},{n:"Motivational Speech",w:"W5",c:1},
+  {n:"Magic Push",w:"W6",c:3},{n:"Trick",w:"W6",c:1},
+  {n:"Beam of Light",w:"W7",c:1},{n:"Ice Spell",w:"W7",c:3},{n:"Mighty Bonk",w:"W7",c:1},
+  {n:"Moonless Night",w:"W7",c:2},{n:"Three Moons Presence",w:"W7",c:1},
+  {n:"Ancient Magic",w:"W8",c:2},{n:"Spell of Separation",w:"W8",c:3},{n:"Tempest",w:"W8",c:2},
+  {n:"Accuracy",w:"W9",c:1},{n:"Dimension Door",w:"W9",c:2},{n:"Electrostatics",w:"W9",c:2},{n:"Animation",w:"W9",c:2},
+  {n:"Luck",w:"W10",c:1},{n:"Earthquake",w:"W10",c:3},{n:"Ancient Fire",w:"W10",c:3},
+  {n:"Magic Shield",w:"W11",c:2},{n:"Acceleration",w:"W11",c:3},{n:"Fiery Bolt",w:"W11",c:2},{n:"The Call of Nature",w:"W11",c:2},
+];
+
+const ITEMS = [
+  {n:"Battle Armor I",w:"Starter",c:4},{n:"Battle Harness",w:"Starter",c:3},{n:"Gar Tech Vest",w:"Starter",c:3},
+  {n:"Helm",w:"Starter",c:2},{n:"Magic Cloak",w:"Starter",c:0},{n:"Weapon Holster",w:"Starter",c:0},
+  {n:"Flaming Shield",w:"Starter",c:2},{n:"Shield of Ka",w:"Starter",c:2},{n:"Ambrosia",w:"Starter",c:2},
+  {n:"Amulet of Avarice",w:"Starter",c:2},{n:"Gem of Magoo",w:"Starter",c:2},{n:"Gem of Tamadge",w:"Starter",c:2},
+  {n:"Golden Disk of Knowledge",w:"Starter",c:2},{n:"Grayskull Ring",w:"Starter",c:2},{n:"Horn of Evil",w:"Starter",c:1},
+  {n:"Jet Pack",w:"Starter",c:3},{n:"Magic Feather",w:"Starter",c:1},{n:"Magic Potion",w:"Starter",c:2},
+  {n:"Orb of Power",w:"Starter",c:2},{n:"Polarizer",w:"Starter",c:2},{n:"Ram Stone",w:"Starter",c:2},
+  {n:"Spellstone",w:"Starter",c:1},{n:"Sun Scarab",w:"Starter",c:2},{n:"Wheel of Infinity",w:"Starter",c:2},
+  {n:"Belt",w:"W1",c:2},{n:"Cloak of Doom",w:"W1",c:2},{n:"Coridite",w:"W1",c:1},{n:"Force Field Rod",w:"W1",c:2},
+  {n:"Shin-Guards",w:"W1",c:1},{n:"Steel Shield",w:"W1",c:2},{n:"Teleporter",w:"W1",c:2},{n:"Tiara",w:"W1",c:1},
+  {n:"Assassin's Belt",w:"W3",c:2},{n:"Bomb Pack",w:"W3",c:3},{n:"Book of Living Spells",w:"W3",c:1},
+  {n:"Gas Tank",w:"W3",c:2},{n:"Grayskull Reliquary",w:"W3",c:0},{n:"King's Goblet",w:"W3",c:2},
+  {n:"Leather Jerkin",w:"W3",c:1},{n:"Visor",w:"W3",c:1},
+  {n:"Bat",w:"W4",c:2},{n:"Cat Mask",w:"W4",c:1},{n:"Cat Shield",w:"W4",c:2},{n:"Eldritch Book of Spells",w:"W4",c:2},
+  {n:"Harp",w:"W4",c:1},{n:"Horde Armband",w:"W4",c:1},{n:"Magic Boots",w:"W4",c:1},{n:"Plate Armour",w:"W4",c:1},
+  {n:"Acid Vial",w:"W5",c:1},{n:"Inquisitor Armor",w:"W5",c:3},{n:"Magic Lamp",w:"W5",c:1},
+  {n:"Magical Shell",w:"W5",c:1},{n:"Rotating Shield",w:"W5",c:1},{n:"Wrap",w:"W5",c:1},
+  {n:"Amulet of Kulataks",w:"W6",c:1},{n:"Buzz Saw",w:"W6",c:3},{n:"Engine Booster",w:"W6",c:1},
+  {n:"Mud-Monster",w:"W6",c:4},{n:"Mystic Plating",w:"W6",c:3},{n:"Reactive Armour",w:"W6",c:1},
+  {n:"Skull",w:"W6",c:-1},{n:"Slug Armour",w:"W6",c:3},{n:"Targeting Computer",w:"W6",c:2},
+  {n:"Energy Shield",w:"W7",c:3},{n:"Galactic Gauntlets",w:"W7",c:2},{n:"Galactic Shoes",w:"W7",c:2},
+  {n:"Halo",w:"W7",c:2},{n:"Heart Emblem",w:"W7",c:1},{n:"Pink Tiara",w:"W7",c:1},
+  {n:"Space Armour",w:"W7",c:2},{n:"Spinning Disc",w:"W7",c:1},
+  {n:"Snake Armour",w:"W8",c:3},{n:"Wooden Wand",w:"W8",c:1},{n:"Snake Shield",w:"W8",c:2},{n:"Bat Snake",w:"W8",c:1},
+  {n:"Dart",w:"W8",c:1},{n:"Trap",w:"W8",c:1},{n:"Refreshment Vial",w:"W8",c:2},{n:"Pot of Poison",w:"W8",c:2},
+  {n:"Mystical Helmet",w:"W9",c:2},{n:"Capacious Bag",w:"W9",c:1},{n:"King's Order",w:"W9",c:2},
+  {n:"Photanium Bar",w:"W9",c:2},{n:"Poisonous Liquid",w:"W9",c:2},{n:"Targan Chains",w:"W9",c:-1},
+  {n:"Doomseeker",w:"W9",c:2},{n:"Steel Bracers",w:"W9",c:3},
+  {n:"Enforcer's Armor",w:"W10",c:2},{n:"He-Ro II Armor",w:"W10",c:3},{n:"King's Shield",w:"W10",c:2},
+  {n:"Herbals",w:"W10",c:1},{n:"Magic Leaf",w:"W10",c:2},{n:"Magic Scroll",w:"W10",c:1},
+  {n:"Preternian Coin",w:"W10",c:2},{n:"Rider's Gloves",w:"W10",c:1},
+  {n:"Tools",w:"W11",c:1},{n:"Secret Liquid of Life",w:"W11",c:3},{n:"Photog Emulator",w:"W11",c:1},
+  {n:"Steel Chainmail",w:"W11",c:3},{n:"War Horn",w:"W11",c:1},{n:"Handy Kit",w:"W11",c:1},
+  {n:"Trap Set",w:"W11",c:1},{n:"Herbal Suspension",w:"W11",c:1},
+  {n:"Radar",w:"Promo",c:1},{n:"The Beak",w:"Promo",c:3},{n:"Control Panel",w:"Promo",c:2},{n:"Heat Detector",w:"Promo",c:3},
+];
+
+const FACTIONS = ["Masters of the Universe","Evil Warriors"];
+const FACTION_COLOR = {
+  "Masters of the Universe":"var(--f-motu)","Evil Warriors":"var(--f-evil)"
+};
+const EQUIP_CATS = [
+  {key:"melee",label:"Nahkampf",data:MELEE,color:"var(--c-melee)"},
+  {key:"ranged",label:"Fernkampf",data:RANGED,color:"var(--c-ranged)"},
+  {key:"heavy",label:"Schwer",data:HEAVY,color:"var(--c-heavy)"},
+  {key:"magic",label:"Magie",data:MAGIC,color:"var(--c-magic)"},
+  {key:"items",label:"Items",data:ITEMS,color:"var(--c-items)"},
+];
+const CAT_INFO = {
+  melee: "Nahkampfwaffe — nur gegen angrenzende Gegner einsetzbar. Test: Stärke gegen Robustheit des Ziels.",
+  ranged: "Fernkampfwaffe — braucht Sichtlinie und Reichweite, nicht einsetzbar im Nahkampf. Test: Wahrnehmung gegen Robustheit.",
+  heavy: "Schwere Waffe — wie Fernkampf, aber auch im Nahkampf einsetzbar. Test: Wahrnehmung gegen Robustheit.",
+  magic: "Zauber — wie Fernkampf, kostet zusätzlich Mana. Test: Macht gegen Geist des Ziels.",
+  items: "Item — Trinket, Schild, Rüstung oder Modul. Wirkt passiv oder als aktive Fähigkeit (ggf. mit AP-/Mana-Kosten)."
+};
+
+/* ============ STATE ============ */
+let army = []; // {uid, charIdx, equip:{melee:[idx,...], ranged:[...], ...}}
+let uidSeed = 1;
+let activeMainTab = "Masters of the Universe";
+let activeEquipUid = null;
+let activeEquipCat = "melee";
+let expandedEquipKey = null; // e.g. "melee-3" — which equip-item submenu is open
+
+// Ausrüstung wird einem Charakter über die gemeinsame Erscheinungsgruppe (w) zugeordnet —
+// das ist die einzige Verknüpfung, die die Cost Tables tatsächlich enthalten.
+function optionsForCharacter(ch, cat){
+  return cat.data
+    .map((it, idx)=>({...it, idx}))
+    .filter(it => it.w === ch.w)
+    .sort((a,b)=> a.n.localeCompare(b.n, 'de'));
+}
+function sortedCharacters(faction){
+  return CHARACTERS
+    .map((c, idx)=>({...c, idx}))
+    .filter(c=>c.f===faction)
+    .sort((a,b)=> a.n.localeCompare(b.n, 'de'));
+}
+
+/* ============ STORAGE ============ */
+// Works inside Claude (window.storage) AND as a standalone hosted page (falls back to localStorage).
+const storageAPI = (typeof window !== 'undefined' && window.storage) ? window.storage : {
+  async get(key){
+    const v = localStorage.getItem(key);
+    if(v === null) throw new Error('not found');
+    return {key, value: v};
+  },
+  async set(key, value){ localStorage.setItem(key, value); return {key, value}; },
+  async delete(key){ localStorage.removeItem(key); return {key, deleted:true}; },
+  async list(prefix){
+    const keys = Object.keys(localStorage).filter(k => !prefix || k.startsWith(prefix));
+    return {keys};
+  }
+};
+
+async function autosave(){
+  try{
+    await storageAPI.set('current-army', JSON.stringify({army, limit: document.getElementById('pointLimit').value}));
+  }catch(e){ console.warn('autosave failed', e); }
+}
+async function loadAutosave(){
+  try{
+    const r = await storageAPI.get('current-army');
+    if(r && r.value){
+      const data = JSON.parse(r.value);
+      army = data.army || [];
+      uidSeed = army.reduce((m,u)=>Math.max(m,u.uid+1),1);
+      if(data.limit) document.getElementById('pointLimit').value = data.limit;
+    }
+  }catch(e){ /* no existing autosave, fine */ }
+}
+async function refreshSavedList(){
+  const sel = document.getElementById('loadSelect');
+  sel.innerHTML = '<option value="">Gespeicherte Armee laden…</option>';
+  try{
+    const r = await storageAPI.list('saved-army:');
+    if(r && r.keys){
+      r.keys.forEach(k=>{
+        const name = k.replace('saved-army:','');
+        const opt = document.createElement('option');
+        opt.value = k; opt.textContent = name;
+        sel.appendChild(opt);
+      });
+    }
+  }catch(e){ /* none saved yet */ }
+}
+
+document.getElementById('btnSave').addEventListener('click', async ()=>{
+  const name = prompt('Name für diese Armee:');
+  if(!name) return;
+  try{
+    await storageAPI.set('saved-army:'+name, JSON.stringify({army, limit: document.getElementById('pointLimit').value}));
+    await refreshSavedList();
+  }catch(e){ alert('Speichern fehlgeschlagen.'); }
+});
+document.getElementById('loadSelect').addEventListener('change', async (e)=>{
+  const key = e.target.value;
+  if(!key) return;
+  if(!confirm('Aktuelle Armee wird durch die gespeicherte Version ersetzt. Fortfahren?')) { e.target.value=''; return; }
+  try{
+    const r = await storageAPI.get(key);
+    if(r && r.value){
+      const data = JSON.parse(r.value);
+      army = data.army || [];
+      uidSeed = army.reduce((m,u)=>Math.max(m,u.uid+1),1);
+      if(data.limit) document.getElementById('pointLimit').value = data.limit;
+      renderAll();
+    }
+  }catch(err){ alert('Laden fehlgeschlagen.'); }
+  e.target.value='';
+});
+document.getElementById('btnDelete').addEventListener('click', async ()=>{
+  const sel = document.getElementById('loadSelect');
+  const key = sel.value || prompt('Welche gespeicherte Armee löschen? (Namen eingeben)');
+  const fullKey = key && key.startsWith('saved-army:') ? key : 'saved-army:'+key;
+  if(!key) return;
+  if(!confirm('Wirklich löschen?')) return;
+  try{ await storageAPI.delete(fullKey); await refreshSavedList(); }catch(e){ alert('Löschen fehlgeschlagen.'); }
+});
+document.getElementById('btnReset').addEventListener('click', ()=>{
+  if(!confirm('Gesamte aktuelle Armee zurücksetzen?')) return;
+  army = []; activeEquipUid = null; renderAll();
+});
+document.getElementById('btnRules').addEventListener('click', ()=>{
+  document.getElementById('rulesPanel').classList.toggle('open');
+});
+document.getElementById('btnRulesClose').addEventListener('click', ()=>{
+  document.getElementById('rulesPanel').classList.remove('open');
+});
+
+/* ============ RENDER: HEADER ============ */
+function updateCrest(){
+  const limit = parseInt(document.getElementById('pointLimit').value) || 0;
+  let total = 0;
+  army.forEach(u=>{
+    total += CHARACTERS[u.charIdx].c;
+    EQUIP_CATS.forEach(cat=>{
+      (u.equip[cat.key]||[]).forEach(idx=>{ total += cat.data[idx].c; });
+    });
+  });
+  document.getElementById('totalNum').textContent = total;
+  document.getElementById('totalNum').classList.toggle('over', total > limit);
+  document.getElementById('limitLbl').textContent = '/ ' + limit;
+  const pct = limit > 0 ? Math.min(100, (total/limit)*100) : (total>0?100:0);
+  const fill = document.getElementById('barFill');
+  fill.style.width = pct + '%';
+  fill.classList.toggle('over', total > limit);
+}
+document.getElementById('pointLimit').addEventListener('input', ()=>{ updateCrest(); autosave(); });
+
+/* ============ RENDER: BROWSER ============ */
+function renderMainTabs(){
+  const wrap = document.getElementById('mainTabs');
+  wrap.innerHTML = '';
+  FACTIONS.forEach(key=>{
+    const tab = document.createElement('div');
+    tab.className = 'tab' + (activeMainTab===key ? ' active' : '');
+    tab.textContent = key;
+    tab.addEventListener('click', ()=>{ activeMainTab = key; renderBrowser(); renderMainTabs(); });
+    wrap.appendChild(tab);
+  });
+}
+
+function charAddedCount(idx){
+  return army.filter(u=>u.charIdx===idx).length;
+}
+
+function unitSubtotal(u, ch){
+  let subtotal = ch.c;
+  EQUIP_CATS.forEach(cat=>{ (u.equip[cat.key]||[]).forEach(idx=>{ subtotal += cat.data[idx].c; }); });
+  return subtotal;
+}
+
+// Shared block: renders one character, either as a tap-to-add row (not yet in army)
+// or as an expandable unit with gear chips + equip panel (already in army).
+// Tapping a not-yet-added character adds it AND opens the equip panel immediately.
+function statVal(v){ return (v===null || v===undefined) ? '–' : v; }
+
+function buildCharCard(ch){
+  const wrap = document.createElement('div');
+  wrap.className = 'char-card';
+
+  if(ch.st){
+    const stats = document.createElement('div');
+    stats.className = 'stat-grid';
+    const st = ch.st;
+    stats.innerHTML = `
+      <div class="stat"><span class="stat-v">${statVal(st.hp)}</span><span class="stat-l">Leben</span></div>
+      <div class="stat"><span class="stat-v">${statVal(st.def)}</span><span class="stat-l">Robustheit</span></div>
+      <div class="stat"><span class="stat-v">${statVal(st.mind)}</span><span class="stat-l">Geist</span></div>
+      <div class="stat"><span class="stat-v">${statVal(st.str)}</span><span class="stat-l">Stärke</span></div>
+      <div class="stat"><span class="stat-v">${statVal(st.per)}</span><span class="stat-l">Wahrnehm.</span></div>
+      <div class="stat"><span class="stat-v">${statVal(st.pow)}</span><span class="stat-l">Macht</span></div>
+      <div class="stat"><span class="stat-v">${statVal(st.mv)}</span><span class="stat-l">Bewegung</span></div>
+    `;
+    wrap.appendChild(stats);
+  }
+
+  if(ch.ab && ch.ab.length){
+    ch.ab.forEach(a=>{
+      const box = document.createElement('div');
+      box.className = 'ability-box';
+      box.innerHTML = `
+        <div class="ability-head"><span class="ability-name">${a.n}</span><span class="ability-cost">${a.cost}</span></div>
+        <div class="ability-text">${a.t}</div>
+      `;
+      wrap.appendChild(box);
+    });
+  } else {
+    const note = document.createElement('div');
+    note.className = 'empty-msg';
+    note.style.padding = '10px 0';
+    note.textContent = 'Für diesen Charakter liegen mir noch keine Kartendaten vor.';
+    wrap.appendChild(note);
+  }
+  return wrap;
+}
+
+function buildUnitNode(ch, charIdx, existingUnit, showFaction){
+  const added = !!existingUnit;
+  const unitEl = document.createElement('div');
+  unitEl.className = 'unit';
+  unitEl.style.borderTopColor = FACTION_COLOR[ch.f];
+  if(added) unitEl.setAttribute('data-uid', existingUnit.uid);
+
+  const head = document.createElement('div');
+  head.className = 'unit-head';
+  const rightSide = added
+    ? `<span class="subtotal">${unitSubtotal(existingUnit, ch)}</span><button class="rm" title="Aus Armee entfernen">✕</button>`
+    : `<span class="subtotal addcost">${ch.c}</span><span class="add-ind">+</span>`;
+  head.innerHTML = `
+    <span class="chevron ${added && activeEquipUid===existingUnit.uid ? 'open':''}">▶</span>
+    <span class="name">${ch.n}${showFaction ? `<span class="faction">${ch.f}</span>` : ''}</span>
+    ${rightSide}
+  `;
+  if(added){
+    head.querySelector('.rm').addEventListener('click', (e)=>{
+      e.stopPropagation();
+      army = army.filter(x=>x.uid!==existingUnit.uid);
+      if(activeEquipUid===existingUnit.uid) activeEquipUid=null;
+      renderAll();
+    });
+  }
+  head.addEventListener('click', ()=>{
+    if(added){
+      activeEquipUid = (activeEquipUid===existingUnit.uid) ? null : existingUnit.uid;
+    } else {
+      const newUid = uidSeed++;
+      army.push({uid:newUid, charIdx, equip:{melee:[],ranged:[],heavy:[],magic:[],items:[]}});
+      activeEquipUid = newUid;
+    }
+    activeEquipCat = "melee";
+    expandedEquipKey = null;
+    renderAll();
+  });
+  unitEl.appendChild(head);
+
+  if(added){
+    const u = existingUnit;
+    // gear chips
+    const chipsWrap = document.createElement('div');
+    chipsWrap.className = 'gear-chips';
+    let anyGear = false;
+    EQUIP_CATS.forEach(cat=>{
+      (u.equip[cat.key]||[]).forEach(idx=>{
+        anyGear = true;
+        const it = cat.data[idx];
+        const chip = document.createElement('div');
+        chip.className = 'gear-chip';
+        chip.style.borderColor = cat.color;
+        chip.innerHTML = `<span>${it.n} (${it.c})</span><span class="x">✕</span>`;
+        chip.querySelector('.x').addEventListener('click', (e)=>{
+          e.stopPropagation();
+          u.equip[cat.key] = u.equip[cat.key].filter(i=>i!==idx);
+          renderAll();
+        });
+        chipsWrap.appendChild(chip);
+      });
+    });
+    if(anyGear) unitEl.appendChild(chipsWrap);
+
+    // equip panel
+    const panel = document.createElement('div');
+    panel.className = 'equip-panel' + (activeEquipUid===u.uid ? ' open' : '');
+    if(activeEquipUid===u.uid){
+      panel.appendChild(buildCharCard(ch));
+
+      const catsRow = document.createElement('div');
+      catsRow.className = 'equip-cats';
+      EQUIP_CATS.forEach(cat=>{
+        const btn = document.createElement('div');
+        btn.className = 'equip-cat-btn' + (activeEquipCat===cat.key ? ' active':'');
+        btn.style.color = activeEquipCat===cat.key ? '#fff' : '';
+        btn.style.borderColor = activeEquipCat===cat.key ? cat.color : '';
+        if(activeEquipCat===cat.key) btn.style.background = cat.color;
+        btn.textContent = cat.label;
+        btn.addEventListener('click', (e)=>{ e.stopPropagation(); activeEquipCat = cat.key; expandedEquipKey = null; renderAll(); });
+        catsRow.appendChild(btn);
+      });
+      panel.appendChild(catsRow);
+
+      const itemsWrap = document.createElement('div');
+      itemsWrap.className = 'equip-items';
+      const cat = EQUIP_CATS.find(c=>c.key===activeEquipCat);
+      const options = optionsForCharacter(ch, cat);
+      if(options.length===0){
+        itemsWrap.innerHTML = '<div class="empty-msg" style="padding:18px 0;">Keine Optionen dieser Kategorie für '+ch.n+'.</div>';
+      }
+      options.forEach(it=>{
+        const idx = it.idx;
+        const key = cat.key+'-'+idx;
+        const equipped = (u.equip[cat.key]||[]).includes(idx);
+        const isOpen = expandedEquipKey === key;
+
+        const row = document.createElement('div');
+        row.className = 'eq-row' + (equipped?' equipped':'');
+
+        const eqHead = document.createElement('div');
+        eqHead.className = 'eq-head';
+        eqHead.style.borderLeftColor = cat.color;
+        eqHead.innerHTML = `
+          <span class="eq-name">${it.n}${it.desc ? ' <span class=\"eq-doc\" title=\"Kartentext vorhanden\">📜</span>' : ''}</span>
+          ${equipped ? '<span class="eq-check">✓</span>' : ''}
+          <span class="eq-cost">${it.c}</span>
+          <span class="eq-chevron ${isOpen?'open':''}">▶</span>
+        `;
+        eqHead.addEventListener('click', (e)=>{
+          e.stopPropagation();
+          expandedEquipKey = isOpen ? null : key;
+          renderAll();
+        });
+        row.appendChild(eqHead);
+
+        const detail = document.createElement('div');
+        detail.className = 'eq-detail' + (isOpen?' open':'');
+        if(isOpen){
+          detail.innerHTML = it.desc
+            ? `<div class="eq-note"><b>Kartentext:</b> ${it.desc}</div>`
+            : `<div class="eq-note">${CAT_INFO[cat.key]}</div>
+               <div class="eq-warn">Die genaue Sonderfähigkeit und Erfolgstabelle dieser Karte steht nur auf der physischen Spielkarte — diese Daten liegen mir nicht vor.</div>`;
+          const actionBtn = document.createElement('button');
+          actionBtn.textContent = equipped ? 'Entfernen' : '+ Ausrüsten';
+          actionBtn.addEventListener('click', (e)=>{
+            e.stopPropagation();
+            if(equipped){
+              u.equip[cat.key] = u.equip[cat.key].filter(i=>i!==idx);
+            } else {
+              u.equip[cat.key] = [...(u.equip[cat.key]||[]), idx];
+            }
+            renderAll();
+          });
+          detail.appendChild(actionBtn);
+        }
+        row.appendChild(detail);
+
+        itemsWrap.appendChild(row);
+      });
+      panel.appendChild(itemsWrap);
+    }
+    unitEl.appendChild(panel);
+  }
+
+  return unitEl;
+}
+
+function renderBrowser(){
+  const body = document.getElementById('browserBody');
+  body.innerHTML = '';
+  const list = document.createElement('div');
+  list.className = 'card-list';
+
+  const chars = sortedCharacters(activeMainTab);
+  chars.forEach(c=>{
+    const existing = army.find(u=>u.charIdx===c.idx);
+    list.appendChild(buildUnitNode(c, c.idx, existing, false));
+  });
+  if(chars.length===0) list.innerHTML = '<div class="empty-msg">Keine Einheiten in dieser Fraktion.</div>';
+  body.appendChild(list);
+}
+
+/* ============ RENDER: ROSTER ============ */
+function renderRoster(){
+  const wrap = document.getElementById('rosterList');
+  wrap.innerHTML = '';
+  document.getElementById('rosterCount').textContent = army.length + (army.length===1 ? ' Einheit' : ' Einheiten');
+
+  if(army.length===0){
+    wrap.innerHTML = '<div class="empty-msg">Noch keine Einheiten ausgewählt.<br>Tippe oben auf einen Charakter, um ihn hinzuzufügen und auszurüsten.</div>';
+    return;
+  }
+
+  army.forEach(u=>{
+    const ch = CHARACTERS[u.charIdx];
+    wrap.appendChild(buildUnitNode(ch, u.charIdx, u, true));
+  });
+}
+
+function renderAll(){
+  renderBrowser();
+  renderRoster();
+  updateCrest();
+  autosave();
+  if(activeEquipUid != null){
+    requestAnimationFrame(()=>{
+      const el = document.querySelector('#browserBody [data-uid="'+activeEquipUid+'"]')
+              || document.querySelector('#rosterList [data-uid="'+activeEquipUid+'"]');
+      if(el) el.scrollIntoView({behavior:'smooth', block:'start'});
+    });
+  }
+}
+
+/* ============ INIT ============ */
+(async function init(){
+  renderMainTabs();
+  await loadAutosave();
+  await refreshSavedList();
+  renderAll();
+})();
+</script>
+</body>
+</html>
